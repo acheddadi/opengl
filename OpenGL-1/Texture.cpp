@@ -1,6 +1,4 @@
 #include "Texture.h"
-
-
 Texture::Texture(const GLchar *filename, GLint width, GLint height, GLboolean mipMap)
 {
 	glGenTextures(1, &id);

@@ -1,5 +1,4 @@
 #include "Mesh.h"
-
 Mesh::Mesh(GLfloat *data, GLint size, GLuint *indice, GLint indiceSize)
 {
 	GLuint stride;

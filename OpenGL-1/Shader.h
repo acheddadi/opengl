@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <GL/glew.h>
-extern bool errorFound;
+#include "Common.h"
 class Shader
 {
 	const GLchar *vertexSourceFile;
