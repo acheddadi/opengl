@@ -15,7 +15,7 @@
 const GLuint WIDTH = 1024, HEIGHT = 768;
 GLfloat mixLevel = 0.2f;
 GLfloat xPos, yPos;
-GLboolean rotate = false, errorFound = false;
+GLboolean rotate = false, errorFound = false, charlieMode = false;
 GLboolean keys[];
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode); //Pointer to window, key pressed, scancode (???), action of key (presse, depressed), bitflag mode (holding shift, ctrl etc.)
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -187,6 +187,7 @@ int main()
 	Texture txtr_container("img/container.jpg", 512, 512);
 	Texture txtr_face("img/awesomeface.png", 512, 512);
 	Texture txtr_sky("img/sky.jpg", 4096, 3072);
+	Texture txtr_charlie("img/charlie.jpg", 512, 512);
 	//Create transformation matrices.
 	glm::mat4 model;
 	model = glm::scale(model, glm::vec3(100, 100, 100));
@@ -215,7 +216,7 @@ int main()
 			myCamera.keyMovement();
 			myCamera.mouseMovement();
 			//Rotation loop.
-			rotation = glm::rotate(rotation, glm::radians(0.05f), glm::vec3(0.5f, 0.5f, 1.0f));
+			if (rotate) rotation = glm::rotate(rotation, glm::radians(0.05f), glm::vec3(0.5f, 0.5f, 1.0f));
 			//Left Triangle.
 			prg_orgTri.useProgram();
 			glBindVertexArray(msh_orgTri.VAO);
@@ -272,12 +273,14 @@ int main()
 																						   GLM stores their matrices not in the exact way that OpenGL likes 
 																						   to receive them so we first transform them with GLM's built-in 
 																						   function value_ptr. */																					
-			glUniform1f(prg_container.getUniform("mixLevel"), mixLevel);
+			if (!charlieMode) glUniform1f(prg_container.getUniform("mixLevel"), mixLevel);
+			else glUniform1f(prg_container.getUniform("mixLevel"), 1.0f);
 			glActiveTexture(GL_TEXTURE0);
 			txtr_container.bindTexture();
 			glUniform1i(prg_container.getUniform("myTexture1"), 0);
 			glActiveTexture(GL_TEXTURE1);
-			txtr_face.bindTexture();
+			if (!charlieMode) txtr_face.bindTexture();
+			else txtr_charlie.bindTexture();
 			glUniform1i(prg_container.getUniform("myTexture2"), 1);
 			glBindVertexArray(msh_cube.VAO);
 			for (int i = 0; i < 10; i++)
@@ -308,6 +311,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	if (keys[GLFW_KEY_ESCAPE]) glfwSetWindowShouldClose(window, GL_TRUE);
 	if (keys[GLFW_KEY_X]){ if (mixLevel >= 1.0f) mixLevel = 0.0f; else mixLevel += 0.1f; }
 	if (keys[GLFW_KEY_Z]){ if (mixLevel <= 0.0f) mixLevel = 1.0f; else mixLevel -= 0.1f; }
+	if (key == GLFW_KEY_C && action == GLFW_PRESS) if (!charlieMode) charlieMode = true; else charlieMode = false;
+	if (key == GLFW_KEY_R && action == GLFW_PRESS) if (!rotate) rotate = true; else rotate = false;
 }
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
