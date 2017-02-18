@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{4cc79422-7eb8-4b13-8bf9-2c7cbb6518c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\Vertex">
+      <UniqueIdentifier>{1619f638-9465-4a2e-8131-e5b602584915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\Fragment">
+      <UniqueIdentifier>{7591a8ee-3fba-44c9-b283-2e7f84670889}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Display.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="fFlckr.frag">
+      <Filter>Shader Files\Fragment</Filter>
+    </Text>
+    <Text Include="fOrg.frag">
+      <Filter>Shader Files\Fragment</Filter>
+    </Text>
+    <Text Include="fRnbw.frag">
+      <Filter>Shader Files\Fragment</Filter>
+    </Text>
+    <Text Include="fTxtr.frag">
+      <Filter>Shader Files\Fragment</Filter>
+    </Text>
+    <Text Include="fYlw.frag">
+      <Filter>Shader Files\Fragment</Filter>
+    </Text>
+    <Text Include="vDflt.vert">
+      <Filter>Shader Files\Vertex</Filter>
+    </Text>
+    <Text Include="vRnbw.vert">
+      <Filter>Shader Files\Vertex</Filter>
+    </Text>
+    <Text Include="vTxtr.vert">
+      <Filter>Shader Files\Vertex</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Display.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sky.frag">
+      <Filter>Shader Files\Fragment</Filter>
+    </None>
+    <None Include="sky.vert">
+      <Filter>Shader Files\Vertex</Filter>
+    </None>
+  </ItemGroup>
+</Project>
