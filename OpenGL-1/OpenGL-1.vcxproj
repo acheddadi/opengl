@@ -39,8 +39,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\alich_000\Documents\C++\OpenGL\OpenGL-1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\alich_000\Documents\C++\OpenGL\OpenGL-1\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\alich_000\Documents\C++\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\alich_000\Documents\C++\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
