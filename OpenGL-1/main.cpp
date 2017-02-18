@@ -9,24 +9,12 @@
 #include "Mesh.h"
 #include "Display.h"
 #include "Texture.h"
+#include "Common.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 const GLuint WIDTH = 1024, HEIGHT = 768;
 bool errorFound = false;
-//glm::mat4 translation;
-bool rotate = false;
-bool keys[1024];
-bool firstMouse = true;
-GLfloat mixLevel = 0.2f, opacityLevel = 1.0f, lastX = WIDTH / 2.0f, lastY = HEIGHT / 2.0f;
-GLfloat pitch, yaw;
-GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
-GLfloat lastFrame = 0.0f;  	// Time of last frame
-glm::mat4 rotation;
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-void doMovement();
 
 int main()
 {
@@ -199,7 +187,7 @@ int main()
 	{
 		glfwPollEvents(); //Checks for any events that are triggered (keyboard or mouse inputs.)
 		//... Rendering commands here.
-		doMovement();
+		myWindow.doMovement();
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); /*At the start of each render iteration we always want to clear the screen otherwise we would still see the results from the previous iteration.
 		We can clear the screen's color buffer using the glClear function where we pass in buffer bits to specify which buffer we would like to clear.
 		The possible bits we can set are GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT and GL_STENCIL_BUFFER_BIT.
@@ -209,32 +197,20 @@ int main()
 		glEnable(GL_DEPTH_TEST);
 		if (!errorFound)
 		{
-			// Calculate deltatime of current frame
-			GLfloat currentFrame = (GLfloat)glfwGetTime();
-			deltaTime = currentFrame - lastFrame;
-			lastFrame = currentFrame;
-			if (rotate)
-			{
-				rotation = glm::rotate(rotation, glm::radians(0.05f), glm::vec3(0.5f, 0.5f, 1.0f));
-			}
 			GLdouble timeValue = glfwGetTime();
 			GLfloat sinTime = (float)(sin(timeValue) / 2) + 0.5f, cosTime = (float)(cos(timeValue * 2) / 2) + 0.5f;
 			GLfloat gVal = sinTime, rVal = cosTime, bVal = cosTime;
 			GLfloat gVal2 = cosTime, rVal2 = sinTime, bVal2 = sinTime;
 
+			glm::mat4 rotation;
+			if (rotate)
+			{
+				rotation = glm::rotate(rotation, glm::radians(0.05f), glm::vec3(0.5f, 0.5f, 1.0f));
+			}
+
 			//Create transformation matrices.
 			glm::mat4 model;
 			model = glm::scale(model, glm::vec3(100, 100, 100));
-			//glm::mat4 view;
-			//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-			GLfloat radius = 10.0f;
-			GLfloat camX = sin((GLfloat)glfwGetTime()) * radius;
-			GLfloat camZ = cos((GLfloat)glfwGetTime()) * radius;
-
-			glm::vec3 cameraTarget = cameraPos + cameraFront;
-			glm::mat4 camera = glm::lookAt(cameraPos, cameraTarget, cameraUp);   //Pos, target pos, up vector.
-
 			glm::mat4 projection;
 			projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 
@@ -273,7 +249,7 @@ int main()
 			//Center texture.
 			prg_sky.useProgram();
 			glUniformMatrix4fv(prg_sky.getUniform("model"), 1, GL_FALSE, glm::value_ptr(model));
-			glUniformMatrix4fv(prg_sky.getUniform("camera"), 1, GL_FALSE, glm::value_ptr(camera));
+			glUniformMatrix4fv(prg_sky.getUniform("camera"), 1, GL_FALSE, myWindow.view);
 			glUniformMatrix4fv(prg_sky.getUniform("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 			glActiveTexture(GL_TEXTURE0);
 			txtr_sky.bindTexture();
@@ -284,12 +260,9 @@ int main()
 
 			//Center texture.
 			prg_container.useProgram();
-			//glUniformMatrix4fv(prg_container.getUniform("model"), 1, GL_FALSE, glm::value_ptr(model));
-			//glUniformMatrix4fv(prg_container.getUniform("view"), 1, GL_FALSE, glm::value_ptr(view));
-			glUniformMatrix4fv(prg_container.getUniform("camera"), 1, GL_FALSE, glm::value_ptr(camera));
+			glUniformMatrix4fv(prg_container.getUniform("camera"), 1, GL_FALSE, myWindow.view);
 			glUniformMatrix4fv(prg_container.getUniform("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 			glUniformMatrix4fv(prg_container.getUniform("rotation"), 1, GL_FALSE, glm::value_ptr(rotation));
-			//glUniformMatrix4fv(prg_container.getUniform("translation"), 1, GL_FALSE,glm::value_ptr(translation));
 																							/*We first query the location of the uniform variable
 																						   and then send the matrix data to the shaders via glUniform 
 																						   function with Matrix4fv as its postfix. The first argument 
@@ -305,19 +278,13 @@ int main()
 																						   to receive them so we first transform them with GLM's built-in 
 																						   function value_ptr. */
 			glUniform1f(prg_container.getUniform("mixLevel"), mixLevel);
-			//glUniform1f(prg_container.getUniform("opacityLevel"), opacityLevel);
 			glActiveTexture(GL_TEXTURE0);
 			txtr_container.bindTexture();
 			glUniform1i(prg_container.getUniform("myTexture1"), 0);
 			glActiveTexture(GL_TEXTURE1);
 			txtr_face.bindTexture();
 			glUniform1i(prg_container.getUniform("myTexture2"), 1);
-			/*
-			//glBindVertexArray(msh_container.VAO);
-			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			*/
 			glBindVertexArray(msh_cube.VAO);
-			//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			for (int i = 0; i < 10; i++)
 			{
@@ -340,105 +307,4 @@ int main()
 						   so the image is instantly display to the user, removing all of the aforementioned artifacts.*/
 	}
 	return 0;
-}
-void Display::key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) glfwSetWindowShouldClose(window, GL_TRUE);
-	if (key == GLFW_KEY_X && action == GLFW_PRESS)
-	{
-		if (mixLevel >= 1.0f) mixLevel = 0.0f;
-		else mixLevel += 0.1f;
-	}
-	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
-	{
-		if (mixLevel <= 0.0f) mixLevel = 1.0f;
-		else mixLevel -= 0.1f;
-	}
-
-	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-	{
-		//translation = glm::translate(translation, glm::vec3(0.1f, 0.0f, 0.0f));
-	}
-	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
-	{
-		//translation = glm::translate(translation, glm::vec3(-0.1f, 0.0f, 0.0f));
-	}
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-	{
-		//translation = glm::translate(translation, glm::vec3(0.0f, 0.1f, 0.0f));
-	}
-	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-	{
-		//translation = glm::translate(translation, glm::vec3(0.0f, -0.1f, 0.0f));
-	}
-	if (key == GLFW_KEY_R && action == GLFW_PRESS)
-	{
-		if (rotate) rotate = false;
-		else rotate = true;
-	}
-	if (key == GLFW_KEY_S && action == GLFW_PRESS)
-	{
-		if (opacityLevel >= 1.0f) opacityLevel = 0.0f;
-		else opacityLevel += 0.1f;
-	}
-	if (key == GLFW_KEY_A && action == GLFW_PRESS)
-	{
-		if (opacityLevel <= 0.0f) opacityLevel = 1.0f;
-		else opacityLevel -= 0.1f;
-	}
-
-	if (action == GLFW_PRESS)
-	{
-		keys[key] = true;
-	}
-	if (action == GLFW_RELEASE)
-	{
-		keys[key] = false;
-	}
-}
-void doMovement()
-{
-	// Camera controls
-	GLfloat cameraSpeed = 5.0f * deltaTime;
-	if (keys[GLFW_KEY_W])
-		cameraPos += cameraSpeed * cameraFront;
-	if (keys[GLFW_KEY_S])
-		cameraPos -= cameraSpeed * cameraFront;
-	if (keys[GLFW_KEY_A])
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	if (keys[GLFW_KEY_D])
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-}
-void Display::mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-	if (firstMouse)
-	{
-		lastX = (GLfloat)xpos;
-		lastY = (GLfloat)ypos;
-		firstMouse = false;
-	}
-
-	GLfloat xoffset = (GLfloat)xpos - lastX;
-	GLfloat yoffset = lastY - (GLfloat)ypos; // Reversed since y-coordinates go from bottom to left
-	lastX = (GLfloat)xpos;
-	lastY = (GLfloat)ypos;
-
-	GLfloat sensitivity = 0.05f;	// Change this value to your liking
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-
-	// Make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(front);
 }
